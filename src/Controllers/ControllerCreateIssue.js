@@ -8,40 +8,40 @@ const login = `${username}:${password}`;
 const encodedLogin = Buffer.from(login).toString("base64");
 const auth = `Basic ${encodedLogin}`;
 
-async function createIssue(req , res , summary , description , projectKey, issueType) {
-    try {
-        const baseurl = "https://" + domain + ".atlassian.net";
-        
-        const data = {
-            fields: {
-                summary: summary,
-                description: description,
-                project: {
-                    key: projectKey
-                },
-                issuetype: {
-                    name: issueType
-                }
-            }
-        };
-        const config = {
-            method: "post",
-            url: baseurl + "/rest/api/2/issue",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": auth
-            },
+async function createIssue(req, res) {
+  const { summary, description, projectKey, issueType } = req.body;
 
-        }
+  try {
+    const baseurl = "https://" + domain + ".atlassian.net";
 
-        console.log(config);
-        const response = await axios.post(`${baseurl}/rest/api/2/issue` , config , data);
-        res.json(response.data);
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: "erreure de serveur" });
+    const data = JSON.stringify({
+      fields: {
+        summary: summary,
+        description: description,
+        project: { key: projectKey },
+        issuetype: { name: issueType }
+      }
+    });
 
-    }
+    const config = {
+      headers: {
+        Authorization: auth,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    };
+
+    const response = await axios.post(
+      `${baseurl}/rest/api/2/issue`,
+      data,
+      config
+    );
+
+    res.json(response.data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 }
 
-module.exports = {createIssue}
+module.exports = { createIssue };
