@@ -8,6 +8,7 @@ const login = `${username}:${password}`;
 const encodedLogin = Buffer.from(login).toString("base64");
 const auth = `Basic ${encodedLogin}`;
 
+
 async function createIssue(req, res) {
   const { summary, description, projectKey, issueType } = req.body;
 
